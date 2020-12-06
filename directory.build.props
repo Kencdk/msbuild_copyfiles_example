@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <!-- Saving some paths that are used elsewhere in MSBuild settings and targets -->
+  <PropertyGroup>
+    <OutputSubdir Condition=" '$(OutputSubDir)' == ''">$(MSBuildProjectName)</OutputSubdir>
+
+    <EnlistmentRoot>$(MSBuildThisFileDirectory)</EnlistmentRoot>
+    <EnlistmentRoot Condition="!HasTrailingSlash('$(EnlistmentRoot)')">$(EnlistmentRoot)\</EnlistmentRoot>
+    <MSBuildOverrides>$(MSBuildToolsPath)</MSBuildOverrides>
+    
+    <!-- setup intermediate folder to be root\Intermedia\ with unique subfolder paths -->
+    <IntermediateRootPath>$(EnlistmentRoot)Intermediates</IntermediateRootPath>
+    <IntermediateOutputPath>$(IntermediateRootPath)\$(Configuration)\$(Platform)\$(OutputSubdir)</IntermediateOutputPath>
+
+    <OutputRootPath>$(EnlistmentRoot)Drops</OutputRootPath>
+    <OutputPath>$(OutputRootPath)\$(Configuration)\$(Platform)\$(OutputSubdir)</OutputPath>
+
+    <!-- Add generated xml documentation files to packaged project output -->
+    <ExcludeXmlAssemblyFiles>false</ExcludeXmlAssemblyFiles>
+  </PropertyGroup>
+  
+  <Target Name="CopyFiles" Condition="'$(CopyInputFiles)' == 'true'" >
+     <ItemGroup>
+      <InputFiles Include="$(MSBuildProjectDirectory)\input\*.txt" />
+    </ItemGroup>
+    <PropertyGroup>
+      <Year>$([System.IO.Directory]::GetParent($(MSBuildProjectDirectory)).Name)</Year>
+      <InputOutputPath>$(OutputRootPath)\$(Configuration)\Input\$(Year)\</InputOutputPath>
+    </PropertyGroup>
+    <Copy SourceFiles="@(InputFiles)" DestinationFolder="$(InputOutputPath)" />
+  </Target>
+</Project>
+
